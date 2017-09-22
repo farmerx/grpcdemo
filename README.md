@@ -96,3 +96,47 @@ helloworld.pb.go    helloworld.proto
 ```
 生成对应的pb.go文件。这里用了plugins选项，提供对grpc的支持，否则不会生成Service的接口。
 
+后面三种可以参考官方的[route_guide](https://github.com/grpc/grpc-go/tree/master/examples/route_guide)示例。 
+
+#### grpc Server
+
+```
+package main
+
+import (
+    "log"
+    "net"
+
+    pb "your_path_to_gen_pb_dir/helloworld"
+    "golang.org/x/net/context"
+    "google.golang.org/grpc"
+)
+
+const (
+    port = ":50051"
+)
+
+// server is used to implement helloworld.GreeterServer.
+type server struct{}
+
+// SayHello implements helloworld.GreeterServer
+func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
+    return &pb.HelloReply{Message: "Hello " + in.Name}, nil
+}
+
+func main() {
+    lis, err := net.Listen("tcp", port)
+    if err != nil {
+        log.Fatalf("failed to listen: %v", err)
+    }
+    s := grpc.NewServer()
+    pb.RegisterGreeterServer(s, &server{})
+    s.Serve(lis)
+}
+```
+
+这里首先定义一个server结构，然后实现SayHello的接口，其定义在“your_path_to_gen_pb_dir/helloworld”
+```
+SayHello(context.Context, *HelloRequest) (*HelloReply, error)
+```
+然后调用grpc.NewServer() 创建一个server s。接着注册这个server s到结构server上面 pb.RegisterGreeterServer(s, &server{}) 最后将创建的net.Listener传给s.Serve()。就可以开始监听并服务了，类似HTTP的ListenAndServe。
