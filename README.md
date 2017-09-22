@@ -15,13 +15,14 @@
 
 * 配置 protoc 到系统的环境变量中，执行如下命令查看是否安装成功：
   ```
-  $ protoc --version
+  protoc --version
   ```
 如果正常打印 libprotoc 的版本信息就表明 protoc 安装成功
 
 * 安装 ProtoBuf 相关的 golang 依赖库
   ```
-  $ go get -u github.com/golang/protobuf/{protoc-gen-go,proto}
+  go get -u github.com/golang/protobuf/proto // golang protobuf 库
+  go get -u github.com/golang/protobuf/protoc-gen-go //protoc --go_out 工具
   ```
 
 
