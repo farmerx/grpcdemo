@@ -34,4 +34,57 @@ go get google.golang.org/grpc
 所以当你 `go get` 失败的时候 不妨尝试git clone https://github.com/grpc/grpc-go 然后在改名
 
 
+### Example go grpc 
+
+该示例源自gRPC-go的examples的helloworld。先看PB的描述：
+```
+syntax = "proto3";
+
+option objc_class_prefix = "HLW";
+
+package helloworld;
+
+// The greeting service definition.
+service Greeter {
+  // Sends a greeting
+  rpc SayHello (HelloRequest) returns (HelloReply) {}
+}
+
+// The request message containing the user's name.
+message HelloRequest {
+  string name = 1;
+}
+
+// The response message containing the greetings
+message HelloReply {
+  string message = 1;
+}
+```
+
+这里定义了一个服务Greeter，其中有个API SayHello。其接受参数为HelloRequest类型，返回HelloReply类型。这里HelloRequest和HelloReply就是普通的PB定义
+
+服务定义为：
+```
+// The greeting service definition.
+service Greeter {
+  // Sends a greeting
+  rpc SayHello (HelloRequest) returns (HelloReply) {}
+}
+```
+
+service定义了一个server。其中的接口可以是四种类型
+
+* rpc GetFeature(Point) returns (Feature) {}
+类似普通的函数调用，客户端发送请求Point到服务器，服务器返回相应Feature.
+
+* rpc ListFeatures(Rectangle) returns (stream Feature) {}
+客户端发起一次请求，服务器端返回一个流式数据，比如一个数组中的逐个元素
+
+* rpc RecordRoute(stream Point) returns (RouteSummary) {}
+客户端发起的请求是一个流式的数据，比如数组中的逐个元素，服务器返回一个相应
+
+*rpc RouteChat(stream RouteNote) returns (stream RouteNote) {}
+客户端发起的请求是一个流式数据，比如数组中的逐个元素，二服务器返回的也是一个类似的数据结构
+
+后面三种可以参考官方的[route_guide](https://github.com/grpc/grpc-go/tree/master/examples/route_guide)示例。
 
