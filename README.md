@@ -83,8 +83,16 @@ service定义了一个server。其中的接口可以是四种类型
 * rpc RecordRoute(stream Point) returns (RouteSummary) {}
 客户端发起的请求是一个流式的数据，比如数组中的逐个元素，服务器返回一个相应
 
-*rpc RouteChat(stream RouteNote) returns (stream RouteNote) {}
+* rpc RouteChat(stream RouteNote) returns (stream RouteNote) {}
 客户端发起的请求是一个流式数据，比如数组中的逐个元素，二服务器返回的也是一个类似的数据结构
 
 后面三种可以参考官方的[route_guide](https://github.com/grpc/grpc-go/tree/master/examples/route_guide)示例。
+
+使用protoc命令生成相关文件：
+```
+protoc --go_out=plugins=grpc:. helloworld.proto
+ls
+helloworld.pb.go    helloworld.proto
+```
+生成对应的pb.go文件。这里用了plugins选项，提供对grpc的支持，否则不会生成Service的接口。
 
