@@ -140,3 +140,61 @@ func main() {
 SayHello(context.Context, *HelloRequest) (*HelloReply, error)
 ```
 然后调用grpc.NewServer() 创建一个server s。接着注册这个server s到结构server上面 pb.RegisterGreeterServer(s, &server{}) 最后将创建的net.Listener传给s.Serve()。就可以开始监听并服务了，类似HTTP的ListenAndServe。
+
+#### grpc client
+```
+package main
+
+import (
+    "log"
+    "os"
+
+    pb "your_path_to_gen_pb_dir/helloworld"
+    "golang.org/x/net/context"
+    "google.golang.org/grpc"
+)
+
+const (
+    address     = "localhost:50051"
+    defaultName = "world"
+)
+
+func main() {
+    // Set up a connection to the server.
+    conn, err := grpc.Dial(address, grpc.WithInsecure())
+    if err != nil {
+        log.Fatalf("did not connect: %v", err)
+    }
+    defer conn.Close()
+    c := pb.NewGreeterClient(conn)
+
+    // Contact the server and print out its response.
+    name := defaultName
+    if len(os.Args) > 1 {
+        name = os.Args[1]
+    }
+    r, err := c.SayHello(context.Background(), &pb.HelloRequest{Name: name})
+    if err != nil {
+        log.Fatalf("could not greet: %v", err)
+    }
+    log.Printf("Greeting: %s", r.Message)
+}
+
+```
+这里通过pb.NewGreeterClient()传入一个conn创建一个client，然后直接调用client上面对应的服务器的接口
+```
+SayHello(context.Context, *HelloRequest) (*HelloReply, error)
+```
+接口，返回*HelloReply 对象。
+
+#### 执行程序
+
+先运行服务器，在运行客户端，可以看到。
+```
+./greeter_server &
+
+./greeter_client
+2016/03/10 21:42:19 Greeting: Hello world
+```
+
+
